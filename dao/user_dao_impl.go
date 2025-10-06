@@ -1,0 +1,33 @@
+package dao
+
+import (
+	"errors"
+	"fmt"
+	"obsidian/config"
+	"obsidian/models"
+	"obsidian/utils"
+	"strings"
+)
+
+type userDAO struct{}
+
+func NewUserDAO() UserDAO {
+	return &userDAO{}
+}
+
+func (u *userDAO) CreateUSER(user *models.User) (*models.User, error) {
+	if passHash, err := utils.HashPassword(user.Password); err != nil {
+		return nil, err
+	} else {
+		user.Password = passHash
+	}
+
+	if err := config.DB.Create(user).Error; err != nil {
+
+		if strings.Contains(err.Error(), "Duplicate entry") {
+			return nil, errors.New(fmt.Sprint("exists"))
+		}
+		return nil, err
+	}
+	return user, nil
+}
