@@ -12,7 +12,7 @@ import (
 
 type userDAO struct{}
 
-func NewUserDAO() interfaces.dao {
+func NewUserDAO() interfaces.UserDAO {
 	return &userDAO{}
 }
 

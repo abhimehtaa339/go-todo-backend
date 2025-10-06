@@ -2,9 +2,9 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"obsidian/controllers"
+	handler "obsidian/handlers"
 )
 
-func ResisterRoutes(r *gin.Engine) {
-	r.POST("/signup", controllers.CreateUser)
+func RegisterRoutes(r *gin.Engine) {
+	r.POST("/signup", handler.CreateUser)
 }

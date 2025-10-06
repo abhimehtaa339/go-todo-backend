@@ -17,7 +17,7 @@ func main() {
 
 	r := gin.Default()
 
-	routes.ResisterRoutes(r)
+	routes.RegisterRoutes(r)
 
 	port := config.GetEnv("PORT", "8001")
 

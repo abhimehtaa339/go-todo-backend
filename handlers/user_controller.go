@@ -3,11 +3,11 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"obsidian/dao"
 	"obsidian/models"
+	"obsidian/repositories/impl"
 )
 
-var userDao = dao.NewUserDAO()
+var userDao = impl.NewUserDAO()
 
 func CreateUser(c *gin.Context) {
 
