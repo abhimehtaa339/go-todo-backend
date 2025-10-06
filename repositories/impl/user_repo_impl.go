@@ -1,17 +1,18 @@
-package dao
+package impl
 
 import (
 	"errors"
 	"fmt"
 	"obsidian/config"
 	"obsidian/models"
+	"obsidian/repositories/interfaces"
 	"obsidian/utils"
 	"strings"
 )
 
 type userDAO struct{}
 
-func NewUserDAO() UserDAO {
+func NewUserDAO() interfaces.dao {
 	return &userDAO{}
 }
 
