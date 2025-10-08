@@ -10,11 +10,11 @@ import (
 var DB *gorm.DB
 
 func ConnectDB() {
-	user := GetEnv("DB_USER", "root")
+	user := GetEnv("DB_USER", " ")
 	pass := GetEnv("DB_PASS", " ")
-	host := GetEnv("DB_HOST", "127.0.0.1")
-	port := GetEnv("DB_PORT", "3306")
-	name := GetEnv("DB_NAME", "obsidian")
+	host := GetEnv("DB_HOST", " ")
+	port := GetEnv("DB_PORT", " ")
+	name := GetEnv("DB_NAME", " ")
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		user, pass, host, port, name)
