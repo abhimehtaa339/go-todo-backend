@@ -1,16 +1,17 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"obsidian/models"
 	"obsidian/repositories/impl"
+	"obsidian/services"
 )
 
-var userDao = impl.NewUserDAO()
+var userService = services.NewUserService(impl.NewUserDAO())
 
-func CreateUser(c *gin.Context) {
-
+func SignUp(c *gin.Context) {
 	var user models.User
 
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -18,15 +19,16 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	newUser, err := userDao.CreateUSER(&user)
+	newUser, status, err := userService.CreateUSER(&user)
 	if err != nil {
-		if err.Error() == "exists" {
-			c.JSON(http.StatusConflict, gin.H{"error": "User with this email or username already exists"})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "database error"})
+		c.JSON(status, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, newUser)
+	c.JSON(status, gin.H{
+		"username":   newUser.Username,
+		"email":      newUser.Email,
+		"name":       fmt.Sprintf("%s %s", newUser.FirstName, newUser.LastName),
+		"dateJoined": newUser.DateJoined,
+	})
 }
