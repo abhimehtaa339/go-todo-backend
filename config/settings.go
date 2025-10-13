@@ -4,6 +4,7 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"time"
 )
 
 func LoadEnv() {
@@ -18,3 +19,9 @@ func GetEnv(key, fallback string) string {
 	}
 	return fallback
 }
+
+// AccessJWTExpiryDuration 15min
+var AccessJWTExpiryDuration = time.Hour * 15
+
+// RefreshJWTExpiryDuration 7days
+var RefreshJWTExpiryDuration = time.Hour * 24 * 7

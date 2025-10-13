@@ -32,3 +32,11 @@ func (u *userDAO) CreateUser(user *models.User) (*models.User, error) {
 	}
 	return user, nil
 }
+
+func (u *userDAO) FindUserByEmail(email string) (*models.User, error) {
+	var user models.User
+	if err := config.DB.Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, utils.BindError("invalid user data")
+	}
+	return &user, nil
+}
