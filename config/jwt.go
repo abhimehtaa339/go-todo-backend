@@ -1,13 +1,15 @@
 package config
 
 import (
+	"errors"
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"log"
 	"time"
 )
 
-var jwtSecret = GetEnv("JWT_SECRET", "")
+var jwtSecret = []byte(GetEnv("JWT_SECRET", ""))
 
 type TokenPair struct {
 	AccessToken  string `json:"access_token"`
@@ -23,7 +25,7 @@ func GenerateTokenPairs(userId uint) (*TokenPair, error) {
 		"jti":     uuid.New().String(),
 	}
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims)
-	accessSigned, err := accessToken.SignedString([]byte(jwtSecret))
+	accessSigned, err := accessToken.SignedString(jwtSecret)
 	if err != nil {
 		log.Printf("Error generating access signed token: %v", err)
 		return nil, err
@@ -37,7 +39,7 @@ func GenerateTokenPairs(userId uint) (*TokenPair, error) {
 		"jti":     uuid.New().String(),
 	}
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
-	refreshSigned, err := refreshToken.SignedString([]byte(jwtSecret))
+	refreshSigned, err := refreshToken.SignedString(jwtSecret)
 	if err != nil {
 		log.Printf("Error generating refresh signed token: %v", err)
 		return nil, err
@@ -47,4 +49,27 @@ func GenerateTokenPairs(userId uint) (*TokenPair, error) {
 		accessSigned,
 		refreshSigned,
 	}, nil
+}
+
+func ValidateToken(tokenString string) (*jwt.Token, error) {
+	// Parse into claims so expiration / nbf are validated for us.
+	claims := jwt.MapClaims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		// enforce expected signing method explicitly
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return jwtSecret, nil
+	})
+	if err != nil {
+		log.Printf("token parse error: %v", err)
+		return nil, err
+	}
+
+	// Verify token is valid according to claims (exp / nbf, signature)
+	if !token.Valid {
+		return nil, errors.New("invalid token")
+	}
+
+	return token, nil
 }

@@ -12,6 +12,7 @@ import (
 type UserService interface {
 	CreateUSER(user *models.User) (*models.User, int, error)
 	Login(email string, password string) (*config.TokenPair, int, error)
+	FindUserById(id int) (*models.User, error)
 }
 
 type userService struct {
@@ -67,4 +68,12 @@ func (u *userService) Login(email string, password string) (*config.TokenPair, i
 		return nil, 500, nil
 	}
 	return token, 200, nil
+}
+
+func (u *userService) FindUserById(id int) (*models.User, error) {
+	user, err := u.repo.FindUserById(id)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
