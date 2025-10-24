@@ -5,7 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"obsidian/config"
 	"obsidian/models"
+	"obsidian/repositories"
+	"obsidian/repositories/impl"
 	"obsidian/routes"
+	"obsidian/services"
 )
 
 func main() {
@@ -15,9 +18,14 @@ func main() {
 
 	config.DB.AutoMigrate(&models.User{})
 
+	// Initialize DAO (concrete implementation of UserDAO)
+	var userRepo repositories.UserDAO = impl.NewUserDAO(config.DB)
+
+	userService := services.NewUserService(userRepo)
+
 	r := gin.Default()
 
-	routes.RegisterRoutes(r)
+	routes.RegisterRoutes(r, userService)
 
 	port := config.GetEnv("PORT", "8001")
 

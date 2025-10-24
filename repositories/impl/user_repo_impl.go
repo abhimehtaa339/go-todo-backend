@@ -10,10 +10,14 @@ import (
 	"obsidian/utils"
 )
 
-type userDAO struct{}
+type userDAO struct {
+	db *gorm.DB
+}
 
-func NewUserDAO() repositories.UserDAO {
-	return &userDAO{}
+func NewUserDAO(db *gorm.DB) repositories.UserDAO {
+	return &userDAO{
+		db: db,
+	}
 }
 
 func (u *userDAO) CreateUser(user *models.User) (*models.User, error) {
@@ -37,6 +41,14 @@ func (u *userDAO) FindUserByEmail(email string) (*models.User, error) {
 	var user models.User
 	if err := config.DB.Where("email = ?", email).First(&user).Error; err != nil {
 		return nil, utils.BindError("invalid user data")
+	}
+	return &user, nil
+}
+
+func (u *userDAO) FindUserById(id int) (*models.User, error) {
+	var user models.User
+	if err := config.DB.Where("id=?", id).First(&user).Error; err != nil {
+		return nil, utils.BindError("user data not found")
 	}
 	return &user, nil
 }
